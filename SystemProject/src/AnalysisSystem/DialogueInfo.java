@@ -4,6 +4,7 @@ package AnalysisSystem;
 import java.util.ArrayList;
 
 public class DialogueInfo {
+	private int a;
 	private double weight;
 	private ArrayList<String> seqKeyList;
 	
