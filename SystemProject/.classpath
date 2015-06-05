@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="lib" path="C:/Users/지환/Downloads/JHanNanum-0.8.4-ko/jhannanum.jar"/>
+	<classpathentry kind="lib" path="C:/Users/지환/Downloads/mallet-2.0.7/mallet-2.0.7/dist/mallet.jar"/>
+	<classpathentry kind="lib" path="C:/Users/지환/Downloads/mallet-2.0.7/mallet-2.0.7/dist/mallet-deps.jar"/>
+	<classpathentry kind="lib" path="C:/Users/지환/Downloads/json_simple-1.1.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
