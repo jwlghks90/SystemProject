@@ -12,20 +12,14 @@ import java.util.Scanner;
 
 public class TFIDF {
 	private Sort sort;
-	private HashMap<String, Double> idfMap; 				// 誘몃━ �깮�꽦�븳 idf留�
+	private HashMap<String, Double> idfMap;
 	private int docSetSize; 
 
 	public TFIDF(){
 		sort = new Sort();
-		readIdfFile("result.txt"); // IDF �뙆�씪
+		readIdfFile("result.txt"); // IDF 파일
 	}
 	
-	/**
-	 * 誘몃━遺꾩꽍�빐 �넃�� Term, IDF媛믪씠 ���옣�맂 txt�뙆�씪�쓣
-	 * �씫�뼱 硫ㅻ쾭蹂��닔 idfMap�뿉 put�븯�뒗 硫붿냼�뱶
-	 * �뙆�씪�쓽 �삎�깭�뒗 term idf �삎�떇 怨듬갚臾몄옄濡� 援щ텇
-	 * @param fileName
-	 */
 	public void readIdfFile(String fileName)
 	{
 		BufferedReader br;
@@ -33,7 +27,7 @@ public class TFIDF {
 			br = new BufferedReader(new FileReader(fileName));
 		}
 		catch (FileNotFoundException e){
-			System.err.println("idf�뙆�씪�씠 �뾾�뒿�땲�떎.");
+			System.err.println("idf file Error");
 			return;
 		}
 		
@@ -42,8 +36,8 @@ public class TFIDF {
 		
 		//System.out.println(sc.next());
 		sc.next();
-		//int docSize = 2585;
-		int docSize = 83;
+		//int docSize = 2585; // idfMap.txt
+		int docSize = 83; // result.txt
 		
         while(sc.hasNext()){
         	String key = sc.next();
@@ -59,12 +53,6 @@ public class TFIDF {
 		catch (IOException e){e.printStackTrace();}
 	}
 	
-	/**
-	 * 臾몄꽌瑜� �엯�젰�븯硫� �빐�떦 臾몄꽌 term�쓽
-	 * TF*IDF媛믪쓣 異쒕젰�빐以��떎.
-	 * �씤�뭼 : String�삎�깭�쓽 臾몄꽌 �븳媛�
-	 * �븘�썐 : �뾾�쓬. 
-	 */
 	public HashMap<String, KeywordInfo> calTFIDF(HashMap<String, KeywordInfo> keywordList)
 	{
 		HashMap<String, Double> tfidfMap = new HashMap<String, Double>();
@@ -89,8 +77,7 @@ public class TFIDF {
         }
 		return keywordList;
 	}
-	
-	//TF 怨꾩궛
+
 	public HashMap<String, KeywordInfo> calTFMap(String noun, String tag, HashMap<String, KeywordInfo> keywordList)
 	{	
 		if(keywordList.containsKey(noun)){
@@ -119,12 +106,6 @@ public class TFIDF {
 		return Math.log(1 + tf);
 	}
 	
-	/**
-	 * 誘몃━ 遺꾩꽍�븳 idfMap�쓣 �솢�슜�븯�뿬
-	 * �빐�떦 term�쓽 idf媛믪쓣 由ы꽩;
-	 * @param term : idf媛믪쓣 �뼸�쓣 term(String)
-	 * 
-	 */
 	public double getIDF(String term)
 	{
 		Double idf = idfMap.get(term);

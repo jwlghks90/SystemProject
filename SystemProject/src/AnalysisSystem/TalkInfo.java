@@ -20,9 +20,11 @@ public class TalkInfo {
 	public double getWeight() {
 		return weight;
 	}
+	
 	public void setWeight(double weight) {
 		this.weight = weight;
 	}
+	
 	public void increase_weight(){
 		this.weight += 2;
 	}

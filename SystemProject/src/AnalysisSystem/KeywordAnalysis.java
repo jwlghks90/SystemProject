@@ -37,7 +37,7 @@ public class KeywordAnalysis {
 	private JSON json;
 	
 	private static HashMap<String, KeywordInfo> keywordList;// 키워드 list
-	private HashMap<Integer, DialogueInfo> talkSeqList;		// 대화 순서 list
+	private HashMap<Integer, DialogueInfo> keySeqList;		// 대화 순서 list
 	private ArrayList<String> coreKeywordList; 				// 핵심 키워드 list
 	private ArrayList<String> preCoreKeywordList;
 	
@@ -68,7 +68,7 @@ public class KeywordAnalysis {
 	//초기화
 	private void init(){
 		keywordList = new HashMap<String, KeywordInfo>();
-		talkSeqList = new HashMap<Integer, DialogueInfo>();
+		keySeqList = new HashMap<Integer, DialogueInfo>();
 		talkView = new ArrayList<String>();
 		keywordFlowList = new ArrayList<KeywordFlowInfo>();
 		eojeolList = new HashMap<Integer, ArrayList<String>>();
@@ -85,7 +85,7 @@ public class KeywordAnalysis {
 	
 	private void update(String doc, ArrayList<String> eojeolList){		
 		this.eojeolList.put(dialogueCnt, eojeolList); // 어절 리스트 추가
-		talkView.add(doc);  					  // 대화 추가
+		talkView.add(doc);  					      // 대화 추가
 		increase_DialogueCnt(); 					  // 대화 증가
 	}
 	
@@ -217,13 +217,12 @@ public class KeywordAnalysis {
 					}
 				}
 			}
-			talkSeqList.put(dialogueCnt, new DialogueInfo(weight, seqkeyList));
+			keySeqList.put(dialogueCnt, new DialogueInfo(weight, seqkeyList));
 			update(doc, strList);
 			keywordList = tfidf.calTFIDF(keywordList);
 			
 			coreKeywordExtraction();
 			coreSentenceExtraction();
-        	//getJson(doc);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -297,6 +296,7 @@ public class KeywordAnalysis {
         String temp;
         int size = 0;
         //System.out.print("키워드 : ");
+        
         while(it.hasNext()){
         	temp = it.next();
         	tag = keywordList.get(temp).getTag();
@@ -331,7 +331,7 @@ public class KeywordAnalysis {
 	}
 	
 	public void checkCoreKeyword(){
-		//int count = 3;
+		//int count = 3; 범위 정할지 생각해야함.
 		boolean flag = false;
 		for(int i = 0; i < preCoreKeywordList.size(); i++){
 			for(int j = 0; j < coreKeywordList.size(); j++){
@@ -349,7 +349,7 @@ public class KeywordAnalysis {
 
 	//핵심 문장 추출
 	public void coreSentenceExtraction(){	
-		HashMap<Integer, DialogueInfo> sl = talkSeqList;
+		HashMap<Integer, DialogueInfo> sl = keySeqList;
         for(String ck : coreKeywordList){
         	for(int i = 0; i < sl.size(); i++){
         		ArrayList<String> tmpList = sl.get(i).getSeqKeyList();
@@ -415,7 +415,6 @@ public class KeywordAnalysis {
 
         if(sw){       
         	coreKeywordExtraction();
-        	//getJson(doc);
         }
         else{
 			while(it.hasNext()){
@@ -429,14 +428,13 @@ public class KeywordAnalysis {
 
 	//공기 관계 Matrix
 	public void co_Occurrence(){		
-		HashMap<Integer, DialogueInfo> tmptalkSeqList = talkSeqList;
+		HashMap<Integer, DialogueInfo> tmpkeySeqList = keySeqList;
 		
 		// 단어 간 공기 관계 테이블
-		coOccurrence = new boolean[dialogueCnt][coreKeywordList.size()];
-		init_coOccurrence(); // 초기화
+		coOccurrence = array.getBooleanMatrix(dialogueCnt, coreKeywordList.size());
 		
-		for(int i = 0; i < tmptalkSeqList.size(); i++){
-			ArrayList<String> tmpList = tmptalkSeqList.get(i).getSeqKeyList();
+		for(int i = 0; i < tmpkeySeqList.size(); i++){
+			ArrayList<String> tmpList = tmpkeySeqList.get(i).getSeqKeyList();
 			for(int j = 0; j < coreKeywordList.size(); j++){
 				String coreKey = coreKeywordList.get(j);
 				for(int k = 0; k < tmpList.size(); k++){
@@ -452,21 +450,12 @@ public class KeywordAnalysis {
 	//회의 종료
 	public void end_Conference(){
         //coreSentenceExtraction(); 	// 핵심 문장 추출
-		co_Occurrence(); 			// 공기 관계
+		co_Occurrence(); 			 // 공기 관계
 		conditional_probability(5);  // 조건부 확률 확인
 		makeSummaryDocument();       // 요약문 생성
 		showSummaryDocument();
 	}
 	
-	public void init_coOccurrence(){
-		for(int i = 0; i < dialogueCnt; i++){
-			for(int j = 0; j < coreKeywordList.size(); j++){
-				coOccurrence[i][j] = false;
-			}
-		}
-	}
-
-
 	// 조건부 확률
 	public void conditional_probability(int depth){
 		int size = coreKeywordList.size();

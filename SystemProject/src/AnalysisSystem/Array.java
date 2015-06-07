@@ -32,4 +32,14 @@ public class Array{
 		}
 		return squareMatrix;
 	}
+	
+	public boolean[][] getBooleanMatrix(int col, int row){	
+		boolean[][] booleanMatrix = new boolean[col][row];
+		
+		for(int i = 0; i < col; i++)
+			for(int j = 0; j < row; j++)
+				booleanMatrix[i][j] = false;
+
+		return booleanMatrix;
+	}
 }

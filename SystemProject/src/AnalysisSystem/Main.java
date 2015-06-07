@@ -1,17 +1,6 @@
 package AnalysisSystem;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Set;
-
-import kr.ac.kaist.swrc.jhannanum.comm.Eojeol;
-import kr.ac.kaist.swrc.jhannanum.comm.Sentence;
-import kr.ac.kaist.swrc.jhannanum.exception.ResultTypeException;
-import kr.ac.kaist.swrc.jhannanum.hannanum.Workflow;
-import kr.ac.kaist.swrc.jhannanum.hannanum.WorkflowFactory;
 
 public class Main {
 	public static void main(String[] args){		
