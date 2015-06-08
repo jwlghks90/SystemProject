@@ -41,78 +41,143 @@ package Parser;
  *  }
  */
 public class URLlist {
-	String[] politics_list = {
-			//"http://www.chosun.com/site/data/rss/politics.xml", // 정치
-			"http://www.chosun.com/site/data/rss/assembly.xml",
-			"http://www.chosun.com/site/data/rss/nk.xml",
-			"http://www.chosun.com/site/data/rss/administration.xml",
-			"http://www.chosun.com/site/data/rss/diplomacy.xml",
-			"http://www.chosun.com/site/data/rss/cwd.xml" };
+	private String assembly = "http://www.chosun.com/site/data/rss/assembly.xml";
+	private String nk = "http://www.chosun.com/site/data/rss/nk.xml";
+	private String administration = "http://www.chosun.com/site/data/rss/administration.xml";
+	private String diplomacy = "http://www.chosun.com/site/data/rss/diplomacy.xml";
+	private String cwd = "http://www.chosun.com/site/data/rss/cwd.xml";
+	private String baseball = "http://www.chosun.com/site/data/rss/baseball.xml";
+	private String soccer = "http://www.chosun.com/site/data/rss/soccer.xml";
+	private String bas = "http://www.chosun.com/site/data/rss/bas.xml";
+	private String golf = "http://www.chosun.com/site/data/rss/golf.xml";
+	private String court = "http://www.chosun.com/site/data/rss/Court.xml";
+	private String education = "http://www.chosun.com/site/data/rss/education.xml";
+	private String defence = "http://www.chosun.com/site/data/rss/defense.xml";
+	private String law = "http://www.chosun.com/site/data/rss/law.xml";
+	private String medical = "http://www.chosun.com/site/data/rss/medical.xml";
+	private String environment = "http://www.chosun.com/site/data/rss/environment.xml";
+	private String traffic = "http://www.chosun.com/site/data/rss/traffic.xml";
+	private String labor = "http://www.chosun.com/site/data/rss/labor.xml";
+	private String asia = "http://www.chosun.com/site/data/rss/asia.xml";
+	private String usa = "http://www.chosun.com/site/data/rss/usa.xml";
+	private String europe = "http://www.chosun.com/site/data/rss/europe.xml";
+	private String dyj = "http://www.chosun.com/site/data/rss/dyj.xml";
+	private String meast = "http://www.chosun.com/site/data/rss/meast.xml";
+	private String w18 = "http://www.chosun.com/site/data/rss/w18.xml";
+	private String w_issue = "http://www.chosun.com/site/data/rss/w_issue.xml";
+	private String health = "http://www.chosun.com/site/data/rss/health.xml";
+	private String books = "http://www.chosun.com/site/data/rss/books.xml";
+	private String culture_media = "http://www.chosun.com/site/data/rss/culture_media.xml";
+	private String religion = "http://www.chosun.com/site/data/rss/religion.xml";
+	private String c_people = "http://www.chosun.com/site/data/rss/c_people.xml";
+	private String life = "http://www.chosun.com/site/data/rss/life.xml";
+	private String f_art = "http://www.chosun.com/site/data/rss/f_art.xml";
+	private String design = "http://www.chosun.com/site/data/rss/design.xml";	
+	private String newsToday_list = "http://myhome.chosun.com/rss/www_section_rss.xml";
+	private String entertainment_list = "http://www.chosun.com/site/data/rss/ent.xml";
 	
-	String[] sport_list = {
-			"http://www.chosun.com/site/data/rss/baseball.xml", // 스포츠
-			"http://www.chosun.com/site/data/rss/soccer.xml",
-			"http://www.chosun.com/site/data/rss/bas.xml",
-			"http://www.chosun.com/site/data/rss/golf.xml" };
+	public URLlist(){}
 	
-	String[] society_list = {
-			//"http://www.chosun.com/site/data/rss/national.xml", // 사회
-			"http://www.chosun.com/site/data/rss/Court.xml",
-			"http://www.chosun.com/site/data/rss/education.xml",
-			"http://www.chosun.com/site/data/rss/defense.xml",
-			"http://www.chosun.com/site/data/rss/medical.xml",
-			"http://www.chosun.com/site/data/rss/livingp.xml",
-			"http://www.chosun.com/site/data/rss/environment.xml",
-			"http://www.chosun.com/site/data/rss/traffic.xml",
-			"http://www.chosun.com/site/data/rss/labor.xml" };
-	String[] international_list = {
-			//"http://www.chosun.com/site/data/rss/international.xml", // 국제
-			"http://www.chosun.com/site/data/rss/asia.xml",
-			"http://www.chosun.com/site/data/rss/usa.xml",
-			"http://www.chosun.com/site/data/rss/europe.xml",
-			"http://www.chosun.com/site/data/rss/meast.xml" };
-	String[] culture = { 
-			//"http://www.chosun.com/site/data/rss/culture.xml", // 문화
-			"http://www.chosun.com/site/data/rss/health.xml",
-			"http://www.chosun.com/site/data/rss/books.xml",
-			"http://www.chosun.com/site/data/rss/culture_media.xml",
-			"http://www.chosun.com/site/data/rss/religion.xml",
-			"http://www.chosun.com/site/data/rss/c_people.xml",
-			"http://www.chosun.com/site/data/rss/life.xml" };
-	
-	String[] newsToday = {
-			"http://myhome.chosun.com/rss/www_section_rss.xml"
-	};
-
-	public String[] getPolitics_list() {
-		return politics_list;
+	public String getAssembly() {
+		return assembly;
 	}
-
-	public void setPolitics_list(String[] politics_list) {
-		this.politics_list = politics_list;
+	public String getNk() {
+		return nk;
 	}
-
-	public String[] getSociety_list() {
-		return society_list;
+	public String getAdministration() {
+		return administration;
 	}
-
-	public void setSociety_list(String[] society_list) {
-		this.society_list = society_list;
+	public String getDiplomacy() {
+		return diplomacy;
 	}
-
-	public String[] getInternational_list() {
-		return international_list;
+	public String getCwd() {
+		return cwd;
 	}
-
-	public void setInternational_list(String[] international_list) {
-		this.international_list = international_list;
+	public String getBaseball() {
+		return baseball;
 	}
-
-	public String[] getCulture() {
-		return culture;
+	public String getSoccer() {
+		return soccer;
 	}
-
-	public void setCulture(String[] culture) {
-		this.culture = culture;
+	public String getBas() {
+		return bas;
+	}
+	public String getGolf() {
+		return golf;
+	}
+	public String getCourt() {
+		return court;
+	}
+	public String getEducation() {
+		return education;
+	}
+	public String getDefence() {
+		return defence;
+	}
+	public String getLaw() {
+		return law;
+	}
+	public String getMedical() {
+		return medical;
+	}
+	public String getEnvironment() {
+		return environment;
+	}
+	public String getTraffic() {
+		return traffic;
+	}
+	public String getLabor() {
+		return labor;
+	}
+	public String getAsia() {
+		return asia;
+	}
+	public String getUsa() {
+		return usa;
+	}
+	public String getEurope() {
+		return europe;
+	}
+	public String getDyj() {
+		return dyj;
+	}
+	public String getMeast() {
+		return meast;
+	}
+	public String getW18() {
+		return w18;
+	}
+	public String getW_issue() {
+		return w_issue;
+	}
+	public String getHealth() {
+		return health;
+	}
+	public String getBooks() {
+		return books;
+	}
+	public String getCulture_media() {
+		return culture_media;
+	}
+	public String getReligion() {
+		return religion;
+	}
+	public String getC_people() {
+		return c_people;
+	}
+	public String getLife() {
+		return life;
+	}
+	public String getF_art() {
+		return f_art;
+	}
+	public String getDesign() {
+		return design;
+	}
+	public String getNewsToday_list() {
+		return newsToday_list;
+	}
+	public String getEntertainment_list() {
+		return entertainment_list;
 	}
 }

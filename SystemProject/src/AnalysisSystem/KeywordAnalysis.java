@@ -44,7 +44,9 @@ public class KeywordAnalysis {
 	private boolean[][] coOccurrence; 						// 단어간 공기 관계
 	private double[][] probabilityMatrix; 					// 확률 메트릭스
 	
-	private ArrayList<String> talkView;						// 대화뷰
+	//private ArrayList<String> talkView;					// 대화뷰
+	private HashMap<String, String> talkView;
+	private ArrayList<String> backupId;
 	private ArrayList<KeywordFlowInfo> keywordFlowList; 	// 시점별 키워드 list
 	private HashMap<Integer, ArrayList<String>> eojeolList; // 스페이스 바 단위
 	private String coreSentence;
@@ -69,8 +71,10 @@ public class KeywordAnalysis {
 	private void init(){
 		keywordList = new HashMap<String, KeywordInfo>();
 		keySeqList = new HashMap<Integer, DialogueInfo>();
-		talkView = new ArrayList<String>();
+		//talkView = new ArrayList<String>();
+		talkView = new HashMap<String, String>();
 		keywordFlowList = new ArrayList<KeywordFlowInfo>();
+		backupId = new ArrayList<String>();
 		eojeolList = new HashMap<Integer, ArrayList<String>>();
 		preCoreKeywordList = null;
 		tfidf = new TFIDF(); 
@@ -79,17 +83,68 @@ public class KeywordAnalysis {
 		sort = new Sort();
 	}
 	
+	private void modify_Init(){
+		keywordList = new HashMap<String, KeywordInfo>();
+		tfidf = new TFIDF();
+		keywordFlowList = new ArrayList<KeywordFlowInfo>();
+		eojeolList = new HashMap<Integer, ArrayList<String>>();
+		preCoreKeywordList = null;
+		keySeqList = new HashMap<Integer, DialogueInfo>();
+		init_DialogueCnt();
+	}
+	
+	private JSONObject modify_Analysis(){
+		int size = backupId.size();
+		String id;
+		String doc;
+		
+		for(int i = 0; i < size-1; i++){
+			id = backupId.get(i);
+			doc = talkView.get(id);
+			keywordExtraction2(id, doc);
+		}
+		
+		id = backupId.get(size-1);
+		doc = talkView.get(id);
+		
+		backupId_Init(size);
+		
+		return keywordExtraction(id, doc);
+	}
+	
+	private void backupId_Init(int scope){
+		for(int i = 0; i < scope; i++)
+			backupId.remove(i);
+	}
+	
 	private void increase_DialogueCnt(){
 		dialogueCnt++;
 	}
 	
-	private void update(String doc, ArrayList<String> eojeolList){		
+	private void init_DialogueCnt(){
+		dialogueCnt = 0;
+	}
+	
+	private void update(String id, String doc, ArrayList<String> eojeolList){		
 		this.eojeolList.put(dialogueCnt, eojeolList); // 어절 리스트 추가
-		talkView.add(doc);  					      // 대화 추가
+		backupId.add(id);
+		talkView.put(id, doc);  					  // 대화 추가
 		increase_DialogueCnt(); 					  // 대화 증가
 	}
 	
-	public JSONObject keywordExtraction(String doc){ // 키워드 추출
+	private void update2(String id, ArrayList<String> eojeolList){
+		this.eojeolList.put(dialogueCnt, eojeolList); // 어절 리스트 추가
+		backupId.add(id);
+		increase_DialogueCnt(); 					  // 대화 증가
+	}
+	
+	public JSONObject getModifyInfo(String id, String doc){
+		talkView.replace(id, doc);
+		modify_Init();
+		return modify_Analysis();
+	}
+	
+	public JSONObject keywordExtraction(String id, String doc){ // 키워드 추출
 		try {
 			ArrayList<String> strList = getTokenizer(doc);
 			tfidf.increase_Document();
@@ -176,8 +231,8 @@ public class KeywordAnalysis {
 												eojeolArray[i+1].getTag(0).equals("pvg")){
 											String tmp = eojeolArray[i+1].getMorpheme(0);
 											for(String s3 : strList){
-												if(s2.matches(".*"+tmp+".*")){
-													seqkeyList.add(s2.substring(s2.indexOf(tmp)));
+												if(s3.matches(".*"+tmp+".*")){
+													seqkeyList.add(s3.substring(s3.indexOf(tmp)));
 													break;
 												}
 											}
@@ -218,7 +273,149 @@ public class KeywordAnalysis {
 				}
 			}
 			keySeqList.put(dialogueCnt, new DialogueInfo(weight, seqkeyList));
-			update(doc, strList);
+			update(id, doc, strList);
+			keywordList = tfidf.calTFIDF(keywordList);
+			
+			coreKeywordExtraction();
+			coreSentenceExtraction();
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return getJSON(doc);
+	}
+	
+	public void keywordExtraction2(String id, String doc){ // 키워드 추출
+		try {
+			ArrayList<String> strList = getTokenizer(doc);
+			tfidf.increase_Document();
+			workflow.analyze(doc); // Analysis using the work flow
+			LinkedList<Sentence> resultList = workflow.getResultOfDocument(new Sentence(0, 0, false));
+			ArrayList<String> seqkeyList = new ArrayList<String>();
+			double weight = 0.0;
+			
+			for (Sentence s : resultList) {
+				Eojeol[] eojeolArray = s.getEojeols();
+				for (int i = 0; i < eojeolArray.length; i++){
+					if (eojeolArray[i].length > 0) {
+						String tag = eojeolArray[i].getTag(0);
+						String morpheme = eojeolArray[i].getMorpheme(0);
+						
+						if(tag.equals("ncpa") || tag.equals("ncn")){
+							// 동작성 명사, 비서술성 명사
+							weight += 1.0;
+							/*if((i+1) < eojeolArray.length && 
+									eojeolArray[i+1].getTag(0).equals("ncn")){
+								calTFMap(morpheme + eojeolArray[i+1].getMorpheme(0), tag);
+								seqkeyList.add(morpheme + eojeolArray[i+1].getMorpheme(0));
+								i++;
+							}
+							else{*/
+								
+							if((i+1) < eojeolArray.length && 
+									eojeolArray[i+1].getTag(0).equals("pvg")){
+								keywordList = tfidf.calTFMap(morpheme, tag, keywordList);
+								seqkeyList.add(morpheme);
+								String tmp = eojeolArray[i+1].getMorpheme(0);
+								for(String s2 : strList){
+									if(s2.matches(".*"+tmp+".*")){
+										seqkeyList.add(s2.substring(s2.indexOf(tmp)));
+										break;
+									}
+								}
+								i++;
+							}
+							else{
+								boolean check = false;
+								for(String s2 : strList){
+									if(s2.matches(".*"+morpheme+"의.*")){
+										if((i+1) < eojeolArray.length && 
+											eojeolArray[i+1].getTag(0).equals("ncn")){
+											keywordList = tfidf.calTFMap(morpheme + eojeolArray[i+1].getMorpheme(0), tag, keywordList);
+											seqkeyList.add(morpheme + eojeolArray[i+1].getMorpheme(0));
+											check = true;
+											i++;
+											break;
+										}
+									}
+								}
+								if(!check){
+									keywordList = tfidf.calTFMap(morpheme,tag,keywordList);
+									for(String s2 : strList){
+										if(s2.matches(".*"+morpheme+".*")){
+											seqkeyList.add(s2);
+											break;
+										}
+									}
+								}
+							}
+						}
+						else if(tag.equals("nnc") || tag.equals("nno")){
+							// 양수사, 서수사
+							weight += 1;
+							if((i+1) < eojeolArray.length){
+								String temp = eojeolArray[i+1].getMorpheme(0);
+								if(temp.equals("년") || temp.equals("월") || temp.equals("일") || temp.equals("시") || 
+										temp.equals("개") || temp.equals("대") || temp.equals("번")){
+									keywordList = tfidf.calTFMap((morpheme + temp), tag, keywordList);
+									seqkeyList.add(morpheme+temp);
+								}
+								else{
+									for(String s2 : strList){
+										if(s2.matches(".*"+morpheme+"년.*") || s2.matches(".*"+morpheme+"월.*") || s2.matches(".*"+morpheme+"일.*") || s2.matches(".*"+morpheme+"시.*")
+												|| s2.matches(".*"+morpheme+"분.*") || s2.matches(".*"+morpheme+"개.*") || s2.matches(".*"+morpheme+"대.*") || s2.matches(".*"+morpheme+"번.*")){	
+											keywordList = tfidf.calTFMap(s2.substring(0, morpheme.length()+1), tag, keywordList);
+											seqkeyList.add(s2.substring(0, morpheme.length()+1));
+											break;
+										}
+										if((i+1) < eojeolArray.length && 
+												eojeolArray[i+1].getTag(0).equals("pvg")){
+											String tmp = eojeolArray[i+1].getMorpheme(0);
+											for(String s3 : strList){ //s2 전체
+												if(s3.matches(".*"+tmp+".*")){
+													seqkeyList.add(s3.substring(s3.indexOf(tmp)));
+													break;
+												}
+											}
+											i++;
+										}
+									}
+								}
+							}
+						}
+						else if(tag.equals("mag")){ 
+							// 일반 부사
+							if(morpheme.equals("매우") 
+									|| morpheme.equals("가장") 
+									|| morpheme.equals("정말") 
+									|| morpheme.equals("아주")){
+								seqkeyList.add(morpheme);
+							}
+						}
+						else if(tag.equals("paa")){ 
+							// 성상형용사
+							for(String s2 : strList){
+								if(s2.matches(".*"+morpheme+".*")){
+									seqkeyList.add(s2);
+									break;
+								}
+							}
+						}
+						else if(morpheme.equals("중요")){
+							// 중요, ncps
+							for(String s2 : strList){
+								if(s2.matches(".*"+morpheme+".*")){
+									seqkeyList.add(s2);
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+			keySeqList.put(dialogueCnt, new DialogueInfo(weight, seqkeyList));
+			update2(id, strList);
 			keywordList = tfidf.calTFIDF(keywordList);
 			
 			coreKeywordExtraction();
@@ -227,12 +424,11 @@ public class KeywordAnalysis {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return getJSON(doc);
 	}
 	
-	public void keywordExtraction2(String doc){ // 키워드 추출
+	public void keywordExtraction3(String id, String doc){ // 키워드 추출
 		try {
-			talkView.add(doc);
+			talkView.put(id,doc);
 			tfidf.increase_Document();
 			workflow.analyze(doc); // Analysis using the work flow
 			LinkedList<Sentence> resultList = workflow.getResultOfDocument(new Sentence(0, 0, false));
@@ -252,10 +448,10 @@ public class KeywordAnalysis {
 		}
 	}
 	
-	public void keywordExtraction3(String doc){ // 키워드 추출
+	public void keywordExtraction4(String id, String doc){ // 키워드 추출
 		try {
 			//workflow = WorkflowFactory.getPredefinedWorkflow(WorkflowFactory.WORKFLOW_POS_SIMPLE_22);	
-			talkView.add(doc);
+			talkView.put(id, doc);
 			tfidf.increase_Document();
 			workflow.analyze(doc); // Analysis using the work flow
 			
@@ -295,19 +491,19 @@ public class KeywordAnalysis {
         String tag;
         String temp;
         int size = 0;
-        //System.out.print("키워드 : ");
+        System.out.print("키워드 : ");
         
         while(it.hasNext()){
         	temp = it.next();
         	tag = keywordList.get(temp).getTag();
-        	//System.out.print(temp + ", ");
+        	System.out.print(temp + ", ");
         	if(tag.equals("ncpa") || tag.equals("ncn")){
         		size++;
         		sum += keywordList.get(temp).getWeight();
         	}
         }
 
-        //System.out.print("핵심 키워드 : ");
+        System.out.print("핵심 키워드 : ");
         double avr = (sum/size);
         
         coreKeywordList = new ArrayList<String>();
@@ -315,7 +511,7 @@ public class KeywordAnalysis {
         while(it2.hasNext()){
         	temp = it2.next();
         	if(avr <= keywordList.get(temp).getWeight()){
-    			//System.out.print(temp + "(" + keywordList.get(temp).getWeight() + "), ");
+    			System.out.print(temp + "(" + keywordList.get(temp).getWeight() + "), ");
         		coreKeywordList.add(temp);
         	}
         }
@@ -331,7 +527,6 @@ public class KeywordAnalysis {
 	}
 	
 	public void checkCoreKeyword(){
-		//int count = 3; 범위 정할지 생각해야함.
 		boolean flag = false;
 		for(int i = 0; i < preCoreKeywordList.size(); i++){
 			for(int j = 0; j < coreKeywordList.size(); j++){
@@ -546,16 +741,17 @@ public class KeywordAnalysis {
 		
 		for(int i = 0; i < summaryKeyword.size(); i++) {
 			for (int j = 0; j < talkView.size(); j++) {
-				if (talkView.get(j).matches(
+				String id = backupId.get(j);
+				if (talkView.get(id).matches(
 						".*" + summaryKeyword.get(i) + ".*")) {
-					s.add(talkView.get(j));
+					s.add(talkView.get(id));
 				}
 			}
 		}
 		
 		for(int i = 0; i < talkView.size(); i++){
 			for(int j = 0; j < s.size(); j++){
-				if(talkView.get(i).equals(s.get(j))){
+				if(talkView.get(backupId.get(i)).equals(s.get(j))){
 					String d = s.get(j) + "\n";
 					summaryDocument += d;
 					break;

@@ -2,7 +2,6 @@ package AnalysisSystem;
 //package kr.ac.kit.AnalysisSystem;
 
 import java.util.Date;
-import java.util.HashMap;
 
 public class KeywordFlowInfo {
 	private String keyword;

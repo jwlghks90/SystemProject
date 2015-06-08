@@ -2,17 +2,27 @@ package AnalysisSystem;
 
 import java.util.ArrayList;
 
+import Clustering.Clustering;
+import Parser.Traveler;
+
 public class Main {
 	public static void main(String[] args){		
+		/*
 		ArrayList<String> dialog = getDialog(1);
 		KeywordAnalysis ka = new KeywordAnalysis();
-		
+		String id = "asdasd";
+
 		for(int i = 0; i < dialog.size(); i++){	
 			//System.out.print(i+1 + ". ");
-			ka.keywordExtraction(dialog.get(i));
+			ka.keywordExtraction(id + i, dialog.get(i));
 		}
 		//ka.showKeywordInfo(true, dialog.get(0));
 		ka.end_Conference();
+		*/
+		Clustering c = new Clustering();
+		c.show_Clustering();
+		//Traveler traveler = new Traveler();
+		//traveler.travel();
 	}
 	
 	public static ArrayList<String> getDialog(int scenario){

@@ -8,7 +8,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
 public class JSON {
+	private final int MAX = 15;
 	
 	public JSON(){}
 	
@@ -30,13 +32,27 @@ public class JSON {
 			jObject.put("dialogue", doc);
 			jObject2.put("name", "ncn");
 			
-			for (int i = 0; i < coreKeywordList.size(); i++) {
-				String keyword = coreKeywordList.get(i);
-				if (keywordList.containsKey(keyword)) {
-					JSONObject jObject3 = new JSONObject();
-					jObject3.put("name", keyword);
-					jObject3.put("size", keywordList.get(keyword).getWeight());
-					jArray3.put(i, jObject3);
+			if(MAX <= coreKeywordList.size()){
+			
+				for (int i = 0; i < MAX; i++) {
+					String keyword = coreKeywordList.get(i);
+					if (keywordList.containsKey(keyword)) {
+						JSONObject jObject3 = new JSONObject();
+						jObject3.put("name", keyword);
+						jObject3.put("size", keywordList.get(keyword).getWeight());
+						jArray3.put(i, jObject3);
+					}
+				}
+			}
+			else{
+				for (int i = 0; i < coreKeywordList.size(); i++) {
+					String keyword = coreKeywordList.get(i);
+					if (keywordList.containsKey(keyword)) {
+						JSONObject jObject3 = new JSONObject();
+						jObject3.put("name", keyword);
+						jObject3.put("size", keywordList.get(keyword).getWeight());
+						jArray3.put(i, jObject3);
+					}
 				}
 			}
 			
@@ -66,8 +82,8 @@ public class JSON {
 			e.printStackTrace();
 		}
 		//mainJsonObj.put("persons", jArray);
-		//String jsonInfo = mainJsonObj.toString();
-		//System.out.println(jsonInfo);		
+		String jsonInfo = mainJsonObj.toString();
+		System.out.println(jsonInfo);		
 		
 		return mainJsonObj;
 	}
