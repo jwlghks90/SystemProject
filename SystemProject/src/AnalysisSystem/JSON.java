@@ -21,7 +21,6 @@ public class JSON {
 		JSONArray jArray3 = new JSONArray();
 		JSONArray jArray4 = new JSONArray();
 		JSONArray jArray5 = new JSONArray();
-		//JSONArray jArray6 = new JSONArray();
 		
 		JSONObject jObject = new JSONObject();
 		JSONObject jObject2 = new JSONObject();
